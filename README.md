@@ -65,6 +65,9 @@ trong `src/styles/global.css` theo cơ chế của phiên bản Tailwind đã c�
 Workflow cài dependencies theo lockfile, chạy kiểm tra, build và triển khai output.
 Nếu bước kiểm tra hoặc build thất bại, job deploy không chạy.
 
+Chỉ dùng nhánh `main` chứa source. Workflow upload bản build dưới dạng artifact
+`github-pages` và triển khai trực tiếp, không tạo nhánh `deploy` hoặc `gh-pages`.
+
 Địa chỉ website: https://ductrongx.github.io
 
 Repository có dạng `<username>.github.io`, nên website nằm ở `/` và không cần
@@ -73,3 +76,18 @@ cần cập nhật `site` và xem lại `base` trong `astro.config.mjs`.
 
 Sau khi chuyển đổi, GitHub Pages phải dùng workflow build thay cho việc phục vụ
 file `index.html` ở thư mục gốc. File HTML xuất bản nằm trong `dist/` sau bước build.
+
+## Xử lý lỗi Pages/Jekyll
+
+Nếu workflow **pages build and deployment** báo `Invalid YAML front matter`
+trong file `.astro`, GitHub Pages đang dùng nguồn **Deploy from a branch** và
+chạy Jekyll trên source Astro.
+
+Đổi **Settings → Pages → Build and deployment → Source** sang **GitHub Actions**.
+Không sửa phần JavaScript giữa hai dấu `---` của file Astro để chiều theo Jekyll.
+Sau đó push một commit mới và kiểm tra workflow **Deploy to GitHub Pages** có cả
+hai job `build` và `deploy` thành công.
+
+Kết quả Jekyll lỗi vẫn được lưu trên commit cũ. Chạy lại workflow Astro trên cùng
+commit không xóa check của workflow Jekyll; kiểm tra trạng thái commit mới để
+xác nhận cấu hình đã được sửa. Website này đã chuyển nguồn Pages sang GitHub Actions.
