@@ -1,0 +1,59 @@
+---
+import TiltCard from './TiltCard.astro';
+interface Props {
+  number: string;
+  title: string;
+  note: string;
+  variant?: 'hero' | 'project';
+}
+const { number, title, note, variant = 'project' } = Astro.props;
+---
+<div class:list={['scene-space', `scene-space--${variant}`]}>
+  <TiltCard>
+  <div class="scene-surface relative flex flex-col justify-between rounded-gallery bg-surface p-7 sm:p-10 lg:p-12">
+    <div class="flex items-center justify-between gap-4 text-caption font-medium uppercase" data-depth-layer>
+      <span class="flex items-center gap-3"><span class="scene-dot" aria-hidden="true"></span><span data-scramble>White box / {title}</span></span>
+      <span>{number}</span>
+    </div>
+    <div class="scene-target my-8 self-center" aria-hidden="true" data-depth-layer>
+      <i></i><i></i><i></i><i></i>
+      <span class="scene-symbol">3D<span class="text-accent">*</span></span>
+      <span class="text-caption uppercase">Space for the unexpected</span>
+    </div>
+    <div class="flex items-end justify-between gap-5 text-caption" data-depth-layer>
+      <p class="max-w-72 leading-relaxed">{note}</p>
+      <span class="scene-axis shrink-0" aria-hidden="true"><span>+</span><span>+</span><span>+</span></span>
+    </div>
+  </div>
+  </TiltCard>
+</div>
+<style>
+  .scene-space { perspective: 1500px; }
+  .scene-space--hero { display: flex; min-height: 420px; }
+  .scene-space--hero .scene-surface { flex: 1; }
+  .scene-space--project { display: flex; width: 100%; aspect-ratio: 1.54; min-height: 300px; }
+  .scene-space--project .scene-surface { flex: 1; min-width: 0; padding: clamp(24px,2vw,40px); }
+  .scene-space--project .scene-target { margin-block: 20px; width: clamp(120px,11vw,180px); min-height: clamp(110px,9vw,160px); }
+  .scene-surface { min-height: inherit; transform-origin: 50% 50%; transform-style: preserve-3d; }
+  [data-depth-layer] { transform: translateZ(30px); }
+  .scene-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); }
+  .scene-target { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; width: 180px; min-height: 160px; }
+  .scene-target i { position: absolute; width: 15px; height: 15px; border-color: var(--color-line); border-style: solid; }
+  .scene-target i:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
+  .scene-target i:nth-child(2) { top: 0; right: 0; border-width: 1px 1px 0 0; }
+  .scene-target i:nth-child(3) { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+  .scene-target i:nth-child(4) { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+  .scene-symbol { font-size: 64px; line-height: 1; letter-spacing: -.06em; }
+  .scene-symbol > span { display: inline-block; vertical-align: top; font-size: 40px; margin-left: 4px; }
+  .scene-axis { display: flex; gap: 20px; font-size: 20px; }
+  @media (max-width: 640px) {
+    .scene-space--hero { min-height: 380px; }
+    .scene-surface { border-radius: var(--radius-card); }
+    .scene-target { width: 140px; min-height: 132px; }
+    .scene-symbol { font-size: 52px; }
+    .scene-axis { gap: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-depth-layer] { transform: none; }
+  }
+</style>

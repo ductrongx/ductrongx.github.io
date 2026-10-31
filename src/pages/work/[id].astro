@@ -1,0 +1,8 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+export async function getStaticPaths(){return (await getCollection('projects',({data})=>!data.draft)).map(entry=>({params:{id:entry.id},props:{entry}}));}
+const {entry}=Astro.props;
+const {Content}=await render(entry);
+---
+<BaseLayout title={`${entry.data.title} — Nguyen Trong Duc`} description={entry.data.description}><main id="main" class="mx-auto max-w-6xl px-6 py-16 md:px-10"><a href="/work/" class="text-sm">← All work</a><div class="mx-auto mt-12 max-w-[700px]"><p class="section-index">DETAIL / NOTES</p><h1 class="mt-5 text-4xl tracking-tight sm:text-5xl">{entry.data.title}</h1><p class="mt-6 text-lg text-body">{entry.data.description}</p>{entry.data.sample&&<p class="my-8 border-l-2 border-accent bg-stone p-4 text-sm">Concept content for this portfolio preview. This is not a verified project or published case study.</p>}<article class="prose mt-10"><Content/></article></div></main></BaseLayout>

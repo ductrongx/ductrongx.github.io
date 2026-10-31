@@ -1,0 +1,35 @@
+---
+import art from './machine.svg?raw';
+import '../styles/anatomy.css';
+---
+<div class="machine iso" data-theme="light">
+ <div class="flex justify-between text-[10px] font-mono tracking-widest text-body"><span>FIG. 01</span><span>SAMPLE READER / AI LAB</span></div>
+ <div class="machine-stage" set:html={art} />
+ <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4"><button type="button" data-run class="min-h-11 rounded border border-ink px-4 text-xs">Chạy mẫu ↗</button><button type="button" data-reset class="min-h-11 px-2 text-xs">Đặt lại</button><span data-status role="status" class="text-xs text-body">Sẵn sàng</span></div>
+ <p class="mt-4 text-[11px] leading-relaxed text-body">Minh họa quy trình AI · không chạy mô hình thực tế</p>
+</div>
+<script>
+ document.querySelectorAll<HTMLElement>('.machine').forEach(root=>{
+ const carriage=root.querySelector<SVGGElement>('[data-carriage]');
+ const run=root.querySelector<HTMLButtonElement>('[data-run]');
+ const reset=root.querySelector<HTMLButtonElement>('[data-reset]');
+ const status=root.querySelector<HTMLElement>('[data-status]');
+ if(!carriage||!run||!reset||!status)return;
+ let frame=0; let elapsed=0; let last=0; let visible=true;
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const paint=(p:number)=>carriage.setAttribute('transform',`translate(${p*150} ${p*82})`);
+ const stop=()=>{cancelAnimationFrame(frame);frame=0;last=0;};
+ const clear=()=>{stop();elapsed=0;paint(0);run.disabled=false;status.textContent='Sẵn sàng';};
+ const tick=(now:number)=>{if(!visible||document.hidden){last=0;return;}if(last)elapsed+=Math.min(now-last,50);last=now;const p=Math.min(elapsed/3000,1);paint(p*p*(3-2*p));const label=p<.25?'Nhận mẫu':p<.7?'Đọc mẫu':p<1?'Chuyển mẫu':'Hoàn tất';if(status.textContent!==label)status.textContent=label;if(p<1)frame=requestAnimationFrame(tick);else{frame=0;run.disabled=false;}};
+ run.addEventListener('click',()=>{clear();if(reduced.matches){paint(1);status.textContent='Hoàn tất';return;}run.disabled=true;frame=requestAnimationFrame(tick);});
+ reset.addEventListener('click',clear);
+ const resume=()=>{if(visible&&!document.hidden&&run.disabled){last=0;frame=requestAnimationFrame(tick);}};
+ new IntersectionObserver(entries=>{visible=entries[entries.length-1].isIntersecting;stop();resume();}).observe(root);
+ document.addEventListener('visibilitychange',()=>{stop();resume();});
+ reduced.addEventListener('change',()=>{if(reduced.matches&&run.disabled){stop();paint(1);status.textContent='Hoàn tất';run.disabled=false;}});
+ });
+</script>
+<style>
+.machine{padding:24px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-stone);--anatomy-hi:#33332b;--anatomy-mid:#96958b;--anatomy-lo:#c7c6ba;--anatomy-faint:#deddd3;--anatomy-paper:#f7f7f4;--anatomy-lit:#26251e;--anatomy-halo:rgba(38,37,30,.08)}
+.machine-stage{width:100%;aspect-ratio:600/390}.machine-stage :global(svg){width:100%;height:auto;overflow:visible}.machine-stage :global(.iso-line){fill:none;stroke:var(--anatomy-mid);stroke-width:.6;stroke-linecap:round;stroke-linejoin:round}.machine-stage :global([data-tone="hi"]){stroke:var(--anatomy-hi)}
+</style>

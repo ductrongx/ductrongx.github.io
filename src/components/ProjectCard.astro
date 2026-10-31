@@ -1,0 +1,53 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ScenePlaceholder from './ScenePlaceholder.astro';
+import ArrowIcon from './ArrowIcon.astro';
+import ScrollReveal from './ScrollReveal.astro';
+interface Props { project: CollectionEntry<'projects'>; index: number; headingTag?: 'h2' | 'h3' }
+const { project, index, headingTag: Heading = 'h3' } = Astro.props;
+const number = String(index + 1).padStart(2, '0');
+---
+<article class="project-card min-w-0" data-project-card={index}>
+  <a href={`/work/${project.id}/`} class="project-link block" aria-label={`Explore ${project.data.title}`}>
+    <div class="tilted-stage" data-tilted-card>
+      <div class="project-media rounded-gallery bg-surface" data-tilted-body>
+        <ScenePlaceholder number={number} title={project.data.category} note={`WHITE BOX · Future artwork for ${project.data.title}.`} />
+      </div>
+    </div>
+    <div class="project-meta mt-6">
+      <ScrollReveal class="project-tags mb-3 uppercase" text={`${project.data.category} · ${project.data.date.getUTCFullYear()}${project.data.sample ? ' · Concept project' : ''}`} />
+      <div class="project-title-row">
+        <span class="project-arrow" aria-hidden="true"><ArrowIcon direction="right" /></span>
+        <ScrollReveal tag={Heading} class="project-title" text={project.data.title} />
+      </div>
+      <ScrollReveal class="mt-3 max-w-xl text-sm leading-relaxed" text={project.data.description} />
+    </div>
+  </a>
+  {project.data.video && <video controls playsinline preload="none" class="mt-6 w-full rounded-card" aria-label={`Demo of ${project.data.title}`}><source src={project.data.video} />Your browser does not support video.</video>}
+</article>
+<style>
+  .project-card { transform-origin: 50% 50%; }
+  .project-link { border-radius: var(--radius-gallery); }
+  .project-meta :global(.project-tags) { font-size: clamp(12px,.875vw,16px); }
+  .tilted-stage { perspective: 1600px; }
+  .project-media { transform-style: preserve-3d; transform-origin: 50% 50%; box-shadow: 0 18px 40px rgb(0 0 0 / calc(var(--tilt-lift, 0) * .07)); }
+  .project-title-row { position: relative; padding-right: 1.3em; font-size: var(--text-project); line-height: 1.15; letter-spacing: -.035em; }
+  .project-title-row :global(.project-title) { overflow-wrap: anywhere; transition: transform .75s var(--ease-gallery); }
+  .project-arrow { position: absolute; top: .13em; left: 0; width: .85em; height: .85em; opacity: 0; transform: translateX(-.35em); transition: transform .75s var(--ease-gallery), opacity .4s; }
+  .project-arrow :global(svg) { width: 100%; height: 100%; }
+  .project-link:focus-visible :global(.project-title) { transform: translateX(1.3em); }
+  .project-link:focus-visible .project-arrow { opacity: 1; transform: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .project-link:hover :global(.project-title) { transform: translateX(1.3em); }
+    .project-link:hover .project-arrow { opacity: 1; transform: none; }
+  }
+  @media (hover: none) {
+    .project-arrow { left: auto; right: 0; opacity: 1; transform: none; }
+    .project-link:focus-visible :global(.project-title) { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .project-media { transform: none !important; box-shadow: none; }
+    .project-link:is(:hover, :focus-visible) :global(.project-title) { transform: none; }
+    .project-arrow { left: auto; right: 0; opacity: 1; transform: none; }
+  }
+</style>

@@ -1,0 +1,15 @@
+{
+  "name": "Nguyen Trong Duc",
+  "role": "AI Engineer",
+  "eyebrow": "AI ENGINEERING · LLM · AGENTIC AI",
+  "headline": "From ideas to AI systems.",
+  "intro": "Hi, I'm Duc. This is where I share what I'm building and exploring in AI engineering.",
+  "email": "nguyentrongduc447@gmail.com",
+  "links": [
+    { "label": "LinkedIn", "url": "https://www.linkedin.com/in/trongduc/" },
+    { "label": "GitHub", "url": "https://github.com/ductrongx" },
+    { "label": "Facebook", "url": "https://www.facebook.com/nguyen.trong.uc.615863" },
+    { "label": "Kaggle", "url": "https://www.kaggle.com/trngcnguyn25" }
+  ],
+  "experience": []
+}

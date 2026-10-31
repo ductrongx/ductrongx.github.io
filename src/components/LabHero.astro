@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { profile } from '../data/profile';
+import ProfilePoster from './ProfilePoster.astro';
+import '../styles/lab.css';
+interface Props { projects: CollectionEntry<'projects'>[]; posts: CollectionEntry<'blog'>[] }
+const { projects, posts } = Astro.props;
+const destinations = [{id:'poster',label:'Giới thiệu'},{id:'work',label:'Dự án'},{id:'experience',label:'Kinh nghiệm'},{id:'blog',label:'Bài viết'},{id:'contact',label:'Liên hệ'}];
+---
+<section class="lab-hero" data-lab data-view="poster" aria-label="Văn phòng nghiên cứu cá nhân">
+ <div class="lab-caption"><span>ĐỨC / AI RESEARCH STUDIO</span><span>01 — THE LAB</span></div>
+ <div class="lab-stage">
+  <svg class="lab-fallback" viewBox="0 0 1100 640" role="img" aria-label="Góc phòng nghiên cứu sáng với poster, bàn làm việc và kệ hồ sơ"><defs><linearGradient id="wall"><stop stop-color="#e1e9eb"/><stop offset="1" stop-color="#ffffff"/></linearGradient><filter id="soft"><feGaussianBlur stdDeviation="12"/></filter></defs><path d="M0 0H1100V640H0Z" fill="#edf2f2"/><path d="M0 0H1100V440L0 520Z" fill="url(#wall)"/><path d="M0 0H170V470L0 520Z" fill="#dceeee"/><path d="M0 520L1100 440V640H0Z" fill="#d5e0e3"/><ellipse cx="550" cy="530" rx="340" ry="35" fill="#192d3b" opacity=".12" filter="url(#soft)"/><path d="M185 415L750 385L885 465L295 505Z" fill="#b9cdd0"/><path d="M295 505V598M825 470V560M220 430V535" stroke="#485e6b" stroke-width="15"/><path d="M440 300L595 290V400L440 410Z" fill="#192d3b"/><path d="M450 310L585 302V388L450 398Z" fill="#dce9f7"/><path d="M515 403V435M475 435H555" stroke="#485e6b" stroke-width="10"/><path d="M905 160H1050V430H905Z" fill="#dceeee"/><path d="M910 240H1045M910 330H1045" stroke="#6b808b" stroke-width="9"/><path d="M920 185H1035M920 205H1035M920 225H1035M920 265H1035M920 285H1035M920 305H1035M920 355H1035M920 375H1035M920 395H1035" stroke="#315a9c" stroke-width="9"/><path d="M475 340L510 325L540 360L570 330M475 370L510 325L540 320L570 360M475 340L510 375L540 360L570 360" fill="none" stroke="#137f84" stroke-width="2"/></svg>
+  <div class="lab-canvas" aria-hidden="true"></div>
+  <ProfilePoster />
+  <div class="lab-scene-hint" hidden data-scene-hint><p class="font-display text-3xl">Bên trong một ý tưởng.</p><p class="mt-2 text-sm text-body">Từ mô hình đến hệ thống. Chọn một trạm để khám phá.</p></div>
+ </div>
+ <div class="lab-toolbar"><p data-lab-status role="status" class="text-xs text-body">Không gian nghiên cứu · Có thể cuộn để xem nội dung</p><button data-overview class="lab-text-button" hidden>Về toàn cảnh ↙</button></div>
+ <nav aria-label="Khám phá nội dung trong lab" class="lab-destinations" data-lab-navigation hidden>{destinations.map((item,i)=><button type="button" data-destination={item.id} aria-pressed={i===0?'true':'false'}><span aria-hidden="true">0{i+1}</span>{item.label}<span aria-hidden="true">↗</span></button>)}</nav>
+ <div class="lab-panel" data-panel hidden>
+  <button class="lab-text-button float-right" data-close>Đóng ×</button>
+  <div data-content="work" hidden><h2 tabindex="-1">Dự án trên bàn làm việc.</h2>{projects.slice(0,2).map(project=><a class="lab-panel-row" href={`/work/${project.id}/`}><strong>{project.data.title} ↗</strong><p>{project.data.description}</p>{project.data.sample&&<small>Nội dung mẫu</small>}</a>)}<a href="#work">Xem phần dự án ↓</a></div>
+  <div data-content="experience" hidden><h2 tabindex="-1">Hành trình nghiên cứu & làm việc.</h2>{profile.experience.length ? profile.experience.map(item=><p class="my-4">{item.period} · {item.company} — {item.role}<br/>{item.description}</p>):<p class="my-5 text-body">Kinh nghiệm làm việc đang được cập nhật. Hiện chưa có thông tin để công bố.</p>}<a href="#experience">Xem kinh nghiệm ↓</a></div>
+  <div data-content="blog" hidden><h2 tabindex="-1">Ghi chép từ compute lab.</h2>{posts.slice(0,3).map(post=><a class="lab-panel-row" href={`/blog/${post.id}/`}><strong>{post.data.title} ↗</strong><p>{post.data.description}</p>{post.data.sample&&<small>Bài viết mẫu</small>}</a>)}<a href="#blog">Xem phần bài viết ↓</a></div>
+  <div data-content="contact" hidden><h2 tabindex="-1">Bắt đầu một cuộc trò chuyện.</h2>{profile.email?<a class="lab-panel-row" href={`mailto:${profile.email}`}>{profile.email}</a>:<p class="my-5 text-body">Thông tin liên hệ đang được cập nhật.</p>}{profile.links.map(link=><a class="lab-panel-row" href={link.url}>{link.label} ↗</a>)}<a href="#contact">Xem phần liên hệ ↓</a></div>
+ </div>
+</section>
+<script>
+ import { initLab } from './lab-controller';
+ document.querySelectorAll<HTMLElement>('[data-lab]').forEach(initLab);
+</script>

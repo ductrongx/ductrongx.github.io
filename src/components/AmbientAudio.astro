@@ -1,0 +1,18 @@
+<div class="sound-control" data-sound-control hidden>
+  <button type="button" class="sound-button" aria-label="Enable sound" aria-pressed="false" title="Enable sound · Dew & ambient" data-sound-toggle>
+    <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="sr-only">Sound <span data-sound-state>OFF</span></span>
+  </button>
+  <span class="sr-only" role="status" data-sound-status></span>
+</div>
+<script>import './ambient-audio';</script>
+<style>
+  .sound-button { display: grid; width: var(--spacing-header-control); height: var(--spacing-header-control); place-items: center; border-radius: var(--radius-pill); background: var(--color-line); }
+  .sound-bars { display: flex; gap: 3px; align-items: center; height: 16px; }
+  .sound-bars i { display: block; height: 2px; width: 3px; background: currentColor; transform-origin: center; }
+  [aria-pressed='true'] .sound-bars i { height: 14px; animation: sound-wave 1.2s ease-in-out infinite alternate; }
+  [aria-pressed='true'] .sound-bars i:nth-child(2) { animation-delay: -.6s; }
+  [aria-pressed='true'] .sound-bars i:nth-child(3) { animation-delay: -.9s; }
+  [aria-pressed='true'] .sound-bars i:nth-child(4) { animation-delay: -.3s; }
+  @keyframes sound-wave { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+</style>

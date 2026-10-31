@@ -1,0 +1,8 @@
+---
+interface Props { direction?: 'diagonal' | 'down' | 'up' | 'right'; class?: string }
+const { direction = 'diagonal', class: className } = Astro.props;
+---
+<svg class={className} width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  {direction === 'diagonal' ? <path d="M5 19 19 5M5 5h14v14" /> : direction === 'down' ? <path d="M12 3v18m-7-7 7 7 7-7" /> : direction === 'right' ? <path d="M3 12h18m-7-7 7 7-7 7" /> : <path d="M12 21V3m-7 7 7-7 7 7" />}
+</svg>
+<style>svg { flex-shrink: 0; } path { stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }</style>

@@ -1,1 +1,89 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: Manrope;
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: Manrope;
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/manrope-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;
+}
+@font-face {
+  font-family: Manrope;
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/manrope-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+@theme {
+  --color-canvas: #f0f1fa;
+  --color-surface: #ffffff;
+  --color-ink: #000000;
+  --color-body: #2b2e3a;
+  --color-line: #e4e6ef;
+  --color-stone: #e4e6ef;
+  --color-control: #2b2e3a;
+  --color-accent: #1a2ffb;
+  --color-accent-active: #1a2ffb;
+  --color-on-accent: #ffffff;
+  --color-sage: #e4e6ef;
+  --color-blue: #e4e6ef;
+  --color-blue-ink: #000000;
+  --color-lilac: #f0f1fa;
+  --color-focus: #1a2ffb;
+  --color-slate: #34393f;
+  --font-sans: Manrope, Arial, sans-serif;
+  --font-display: Manrope, Arial, sans-serif;
+  --font-mono: Manrope, Arial, sans-serif;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 500;
+  --radius-card: 15px;
+  --radius-input: 18px;
+  --radius-pill: 87.5px;
+  --radius-gallery: 15px;
+  --container-gallery: 2400px;
+  --spacing-header-top: clamp(40px, 3.2vw, 80px);
+  --spacing-header-control: clamp(45px, 2.9vw, 72px);
+  --spacing-scroll-offset: clamp(120px, 7.5vw, 180px);
+  --spacing-project-column: clamp(24px, 2vw, 48px);
+  --spacing-project-row: clamp(48px, 5vw, 96px);
+  --text-control: clamp(12px, .8333vw, 20px);
+  --text-caption: 12px;
+  --text-display: clamp(3.3rem, 8.6vw, 8rem);
+  --text-section: clamp(2.5rem, 5.5vw, 5rem);
+  --text-editorial: clamp(2.6rem, 5.6vw, 6.5rem);
+  --text-statement: clamp(2.8rem, 6.5vw, 7.5rem);
+  --text-project: clamp(1.75rem, 2.5vw, 3rem);
+  --shadow-surface: 0 6px 10px #0000000a, 0 2px 4px #0000000a;
+  --shadow-panel: 0 6px 10px #0000000a, 0 2px 4px #0000000a;
+  --ease-gallery: cubic-bezier(.16, 1, .3, 1);
+  --ease-slide: cubic-bezier(.76, 0, .24, 1);
+}
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: var(--spacing-scroll-offset); }
+  html:has(dialog[open]) { overflow: hidden; }
+  body { letter-spacing: 0; }
+  a, button { -webkit-tap-highlight-color: transparent; }
+  button, summary { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 6px; }
+  ::selection { background: var(--color-accent); color: var(--color-surface); }
+  h1, h2, h3 { font-weight: 400; text-wrap: balance; }
+  p { overflow-wrap: anywhere; }
+  @media (min-width: 768px) and (max-width: 1023px) {
+    :root { --spacing-scroll-offset: 180px; }
+  }
+  @media (max-width: 767px) {
+    :root { --spacing-header-top: 24px; --spacing-header-control: 45px; --spacing-scroll-offset: 216px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+}

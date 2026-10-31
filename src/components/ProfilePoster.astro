@@ -1,0 +1,13 @@
+---
+import { profile } from '../data/profile';
+---
+<div class="profile-poster" data-poster>
+ <div class="poster-copy">
+  <p class="poster-kicker"><span aria-hidden="true"></span> THE EXPERIMENTAL MIND</p>
+  <h1>{profile.name}<span class="poster-role">{profile.role}<span aria-hidden="true">↗</span></span></h1>
+  <p class="poster-statement">Thử nghiệm ý tưởng.<br/>Kiến tạo khả năng mới.</p>
+  <p class="poster-intro">{profile.intro}</p>
+  <div class="poster-actions"><button class="lab-button" data-explore hidden>Khám phá lab <span aria-hidden="true">↗</span></button><a href="#work">Xem dự án ↓</a></div>
+  <div class="poster-foot"><div class="portrait-placeholder" aria-label="Vị trí ảnh cá nhân, chưa bổ sung"><span aria-hidden="true">D.</span><small>Ảnh cá nhân · Chờ bổ sung</small></div><p>LLM / AGENTIC AI<br/><span>Ý tưởng → Thử nghiệm → Hệ thống</span></p></div>
+ </div>
+</div>

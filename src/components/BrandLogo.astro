@@ -1,0 +1,72 @@
+---
+import { profile } from '../data/profile';
+interface Props { href: string }
+const { href } = Astro.props;
+const faces = ['front', 'back', 'left', 'right', 'top', 'bottom'];
+const vertices = [-1, 1].flatMap(x => [-1, 1].flatMap(y => [-1, 1].map(z => ({ x, y, z }))));
+---
+<a href={href} class="brand-logo" aria-label={`DUC.ai — ${profile.name} — Back to top`} data-brand-logo>
+  <span class="brand-icon" aria-hidden="true">
+    <span class="brand-float" data-brand-float>
+      <span class="brand-tesseract" data-brand-cube>
+        <span class="brand-cage brand-cage--outer">{faces.map(face => <span class={`brand-face brand-face--${face}`}></span>)}</span>
+        <span class="brand-cage brand-cage--inner">{faces.map(face => <span class={`brand-face brand-face--${face}`}></span>)}</span>
+        {['front', 'right'].map(side => <span class={`brand-electric brand-electric--${side}`}>
+          <svg viewBox="-1 -1 18 18" width="18" height="18" fill="none">
+            <path class="brand-current" d="M0 16V0H16V16H0" pathLength="100" />
+            <path class="brand-arc" d="M0 16L5 10L4 7L10 5L16 0" pathLength="30" />
+          </svg>
+        </span>)}
+        {vertices.map(({ x, y, z }) => <>
+          <span class="brand-node" style={`transform:translate3d(${x * 8}px,${y * 8}px,${z * 8}px)`}></span>
+          <span class="brand-connector" style={`transform:translate3d(${x * 6}px,${y * 6}px,${z * 6}px) rotate3d(${z},0,${-x},${Math.acos(y / Math.sqrt(3)) * 180 / Math.PI}deg)`}></span>
+        </>)}
+        <span class="brand-core"><span></span><span></span><span></span></span>
+      </span>
+    </span>
+  </span>
+  <span class="brand-name" aria-hidden="true">DUC<span class="brand-dot">.</span><span class="brand-ai" data-brand-ai>ai</span></span>
+</a>
+<script>import './brand-logo';</script>
+<style>
+  .brand-logo { --brand-blue: #1d35ff; display: inline-flex; align-items: center; justify-self: start; gap: 12px; min-height: 44px; height: var(--spacing-header-control); color: #0f172a; cursor: pointer; pointer-events: auto; white-space: nowrap; }
+  .brand-name { display: inline-flex; align-items: baseline; font-family: var(--font-sans); font-size: clamp(27px,2.22vw,40px); font-weight: 700; letter-spacing: -.055em; line-height: 1; }
+  .brand-dot { color: var(--brand-blue); text-shadow: 0 0 7px #1d35ff24; }
+  .brand-ai { display: inline-block; width: 2ch; color: var(--brand-blue); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .85em; font-weight: 500; letter-spacing: -.055em; }
+  .brand-icon { position: relative; display: block; width: 44px; height: 44px; flex: 0 0 44px; perspective: 200px; pointer-events: none; }
+  .brand-float { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .brand-tesseract { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; scale: 1.55; transform: rotateX(-24deg) rotateY(-35deg); }
+  .brand-cage { --edge: 16px; --depth: 8px; position: absolute; inset: 0; transform-style: preserve-3d; }
+  .brand-cage--inner { --edge: 8px; --depth: 4px; }
+  .brand-face { position: absolute; left: calc(var(--edge) / -2); top: calc(var(--edge) / -2); width: var(--edge); height: var(--edge); border: .85px solid #7b90bdc2; background: #ffffff12; backface-visibility: visible; }
+  .brand-cage--inner .brand-face { border-color: #1d35ffb3; background: #1d35ff08; }
+  .brand-face--front { transform: translateZ(var(--depth)); border-color: #1d35ffa6; }
+  .brand-face--back { transform: rotateY(180deg) translateZ(var(--depth)); }
+  .brand-face--left { transform: rotateY(-90deg) translateZ(var(--depth)); }
+  .brand-face--right { transform: rotateY(90deg) translateZ(var(--depth)); border-color: #1d35ff99; }
+  .brand-face--top { transform: rotateX(90deg) translateZ(var(--depth)); }
+  .brand-face--bottom { transform: rotateX(-90deg) translateZ(var(--depth)); }
+  .brand-node { position: absolute; width: 2.4px; height: 2.4px; margin: -1.2px; border: .35px solid #c9d4ff; border-radius: 50%; background: var(--brand-blue); box-shadow: 0 0 3px #1d35ff66; }
+  .brand-connector { position: absolute; width: .8px; height: 6.928px; left: -.4px; top: -3.464px; background: #1d35ff66; }
+  .brand-electric { position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; }
+  .brand-electric--front { transform: translateZ(8.15px); }
+  .brand-electric--right { transform: rotateY(90deg) translateZ(8.15px); }
+  .brand-electric svg { overflow: visible; filter: drop-shadow(0 0 1.2px #1d35ff80); }
+  .brand-current, .brand-arc { stroke: var(--brand-blue); stroke-linecap: round; stroke-linejoin: round; transition: opacity .3s; }
+  .brand-current { stroke-width: .9px; stroke-dasharray: 16 84; animation: brand-current 3s linear infinite; opacity: .8; }
+  .brand-arc { stroke-width: .65px; stroke-dasharray: 5 25; animation: brand-discharge 3.8s linear infinite; opacity: .35; }
+  .brand-electric--right .brand-current { animation-delay: -1.5s; }
+  .brand-electric--right .brand-arc { animation-delay: -2.3s; }
+  .brand-logo[data-engaged] :is(.brand-current,.brand-arc) { opacity: 1; }
+  .brand-logo[data-motion-paused] :is(.brand-current,.brand-arc) { animation-play-state: paused; }
+  @keyframes brand-current { to { stroke-dashoffset: -100; } }
+  @keyframes brand-discharge { to { stroke-dashoffset: -30; } }
+  .brand-core { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .brand-core span { position: absolute; width: 4.6px; height: 4.6px; margin: -2.3px; border: .4px solid #c9d4ff; border-radius: 50%; background: var(--brand-blue); box-shadow: 0 0 5px #1d35ff8c; transition: box-shadow .3s; }
+  .brand-core span:nth-child(2) { transform: rotateY(90deg); }
+  .brand-core span:nth-child(3) { transform: rotateX(90deg); }
+  .brand-logo[data-engaged] .brand-core span, .brand-logo:focus-visible .brand-core span { box-shadow: 0 0 5px #1d35ffcc, 0 0 10px #1d35ff55; }
+  @media (hover: hover) { .brand-logo:hover .brand-core span { box-shadow: 0 0 5px #1d35ffcc, 0 0 10px #1d35ff55; } }
+  @media (max-width: 767px) { .brand-icon { width: 40px; height: 40px; flex-basis: 40px; } .brand-tesseract { scale: 1.4; } .brand-logo { gap: 10px; } }
+  @media (prefers-reduced-motion: reduce) { .brand-core span { transition: none; } .brand-current, .brand-arc { animation: none; transition: none; } .brand-arc { opacity: .2; } }
+</style>

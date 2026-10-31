@@ -1,0 +1,63 @@
+---
+import ArrowIcon from './ArrowIcon.astro';
+---
+<button type="button" class="assistant-launcher" data-assistant-launcher data-chat-open aria-label="Open portfolio assistant preview" aria-haspopup="dialog" aria-controls="portfolio-chat" aria-expanded="false" hidden>
+  <span class="orb-fallback" aria-hidden="true"></span>
+  <canvas width="128" height="128" data-strands-orb aria-hidden="true"></canvas>
+  <span class="assistant-hint">Meet the assistant</span>
+</button>
+<dialog id="portfolio-chat" class="assistant-dialog" aria-labelledby="assistant-title" aria-describedby="assistant-description" data-lenis-prevent>
+  <div class="assistant-panel">
+    <div class="assistant-header">
+      <span class="assistant-avatar" aria-hidden="true">d.</span>
+      <div><h2 id="assistant-title" class="text-base">Duc’s assistant</h2><p class="mt-1 text-xs text-body">A curious companion · UI preview</p></div>
+      <button type="button" class="assistant-close" data-chat-close aria-label="Close assistant"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" /></svg></button>
+    </div>
+    <div class="assistant-body">
+      <p class="section-index text-body">A space for questions</p>
+      <h3 class="assistant-greeting">Good questions<br />start something.</h3>
+      <p id="assistant-description" class="mt-4 text-sm leading-relaxed text-body">Explore the chat interface. AI replies and message sending are not connected yet.</p>
+      <div class="assistant-suggestions" aria-label="Try a question">
+        <button type="button" data-chat-prompt="What is Duc exploring in AI?">What are you exploring?<ArrowIcon /></button>
+        <button type="button" data-chat-prompt="Tell me about the selected projects.">Show me the projects<ArrowIcon /></button>
+        <button type="button" data-chat-prompt="How do you approach building an AI system?">How do you approach a problem?<ArrowIcon /></button>
+      </div>
+    </div>
+    <div class="assistant-compose">
+      <label for="assistant-message" class="text-xs text-body">Your question</label>
+      <div class="assistant-input-row"><textarea id="assistant-message" rows="2" maxlength="1000" placeholder="What are you curious about?" aria-describedby="assistant-preview-note"></textarea><button type="button" disabled aria-label="Send message — unavailable in this preview"><ArrowIcon direction="up" /></button></div>
+      <p id="assistant-preview-note" class="mt-3 text-xs text-body">Interface preview only. Nothing is sent or saved.</p>
+    </div>
+  </div>
+</dialog>
+<script>import './portfolio-assistant';</script>
+<style>
+  .assistant-launcher { position: fixed; z-index: 55; right: max(20px,env(safe-area-inset-right)); bottom: max(18px,env(safe-area-inset-bottom)); width: 88px; height: 88px; border-radius: 50%; transition: transform .6s var(--ease-gallery), opacity .3s; }
+  .assistant-launcher[hidden] { display: none; }
+  .assistant-launcher[aria-expanded='true'] { opacity: 0; pointer-events: none; transform: scale(.75); }
+  .assistant-launcher canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .orb-fallback { position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle at 30% 22%,#fff 0%,#c9d0f9 22%,#7b8df7 45%,#182569 80%); box-shadow: inset 0 0 10px #fff8, 0 8px 24px #253e7430; }
+  .assistant-launcher[data-orb-ready] .orb-fallback { opacity: 0; }
+  .assistant-hint { position: absolute; right: 100%; top: 28px; margin-right: 8px; white-space: nowrap; font-size: 12px; background: var(--color-surface); padding: 9px 14px; border-radius: var(--radius-pill); box-shadow: var(--shadow-surface); opacity: 0; transform: translateX(8px); transition: opacity .3s, transform .4s; pointer-events: none; }
+  .assistant-launcher:is(:hover,:focus-visible) .assistant-hint { opacity: 1; transform: none; }
+  .assistant-dialog { position: fixed; inset: auto 24px 24px auto; width: min(430px,calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 48px); margin: 0; padding: 0; border: 1px solid rgb(255 255 255 / .8); border-radius: 28px; background: var(--color-canvas); color: var(--color-ink); box-shadow: 0 24px 100px #20244930; overflow: auto; }
+  .assistant-dialog::backdrop { background: rgb(28 31 48 / .14); backdrop-filter: blur(4px); }
+  .assistant-panel { display: flex; flex-direction: column; min-height: min(620px,calc(100dvh - 50px)); }
+  .assistant-header { display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid var(--color-line); }
+  .assistant-avatar { display: grid; place-items: center; flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; background: var(--color-accent); color: white; font-size: 23px; }
+  .assistant-close { display: grid; place-items: center; margin-left: auto; min-width: 44px; height: 44px; border-radius: 50%; background: var(--color-surface); }
+  .assistant-close:hover { background: var(--color-line); }
+  .assistant-body { flex: 1; padding: 32px 28px; }
+  .assistant-greeting { margin-top: 24px; font-size: clamp(29px,4vw,36px); letter-spacing: -.04em; line-height: 1.15; }
+  .assistant-suggestions { display: grid; gap: 8px; margin-top: 28px; }
+  .assistant-suggestions button { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; min-height: 48px; font-size: 12px; text-align: left; background: var(--color-surface); border-radius: 12px; transition: transform .3s, background .3s; }
+  .assistant-suggestions button:hover { transform: translateX(3px); background: #e4e8ff; }
+  .assistant-suggestions :global(svg) { width: 16px; height: 16px; flex-shrink: 0; }
+  .assistant-compose { padding: 20px; border-top: 1px solid var(--color-line); background: rgb(255 255 255 / .55); }
+  .assistant-input-row { display: flex; align-items: end; gap: 12px; padding: 12px; margin-top: 8px; border: 1px solid var(--color-line); border-radius: 16px; background: var(--color-surface); }
+  .assistant-input-row:focus-within { border-color: var(--color-accent); }
+  .assistant-input-row textarea { width: 100%; min-width: 0; resize: none; font-size: 16px; line-height: 1.5; padding: 4px; }
+  .assistant-input-row textarea:focus-visible { outline-offset: 2px; }
+  .assistant-input-row button { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: var(--color-line); color: #757b8c; cursor: not-allowed; }
+  @media (max-width: 767px) { .assistant-launcher { width: 72px; height: 72px; right: 12px; bottom: 12px; } .assistant-dialog { right: 16px; bottom: max(16px,env(safe-area-inset-bottom)); } .assistant-hint { display: none; } }
+</style>

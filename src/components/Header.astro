@@ -1,0 +1,68 @@
+---
+import AmbientAudio from './AmbientAudio.astro';
+import BrandLogo from './BrandLogo.astro';
+const items = [
+  { id: 'about', label: 'About me' },
+  { id: 'work', label: 'Work' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'blog', label: 'Blog' },
+  { id: 'contact', label: 'Contact' },
+];
+const homePath = Astro.url.pathname === '/' ? '' : '/';
+const activeId = Astro.url.pathname.startsWith('/work') ? 'work' : Astro.url.pathname.startsWith('/blog') ? 'blog' : 'about';
+---
+<header class="site-header" data-site-header>
+  <div class="gallery-shell header-inner">
+    <BrandLogo href={`${homePath}#top`} />
+    <div class="header-controls"><AmbientAudio /></div>
+    <nav class="gooey-nav" aria-label="Main navigation" data-gooey-nav data-active-section={activeId}>
+      <svg class="gooey-filter-defs" width="0" height="0" aria-hidden="true">
+        <defs><filter id="gooey-nav-filter" x="-20%" y="-50%" width="140%" height="200%" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" />
+        </filter></defs>
+      </svg>
+      <div class="gooey-layer" aria-hidden="true"><span class="gooey-pill"></span><span class="gooey-particles"></span></div>
+      <ul class="gooey-list">
+        {items.map(item => <li><a href={`${homePath}#${item.id}`} class="gooey-link" data-section={item.id} aria-current={activeId === item.id ? (Astro.url.pathname === '/' ? 'location' : 'page') : undefined}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+</header>
+<script>import './gooey-nav';</script>
+<style>
+  .site-header { position: fixed; top: 0; inset-inline: 0; z-index: 50; isolation: isolate; pointer-events: none; padding-top: var(--spacing-header-top); padding-bottom: 12px; border-bottom: 1px solid transparent; transition: background .35s, border-color .35s; }
+  .site-header[data-scrolled] { background: rgb(240 241 250 / .84); border-color: rgb(255 255 255 / .6); backdrop-filter: blur(20px) saturate(1.2); }
+  .header-inner { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: clamp(12px,1vw,24px); }
+  .header-controls { justify-self: end; pointer-events: auto; }
+  .gooey-nav { position: relative; isolation: isolate; padding: 6px; border-radius: var(--radius-pill); background: var(--color-line); pointer-events: auto; }
+  .gooey-filter-defs { position: absolute; pointer-events: none; }
+  .gooey-list { position: relative; z-index: 1; display: flex; gap: 2px; }
+  .gooey-list li { min-width: 0; }
+  .gooey-link { position: relative; isolation: isolate; display: flex; min-height: var(--spacing-header-control); align-items: center; justify-content: center; padding: 10px clamp(12px,1.1vw,24px); border-radius: var(--radius-pill); font-size: clamp(12px,.83vw,16px); font-weight: 500; white-space: nowrap; transition: color .2s; }
+  .gooey-link[aria-current] { color: var(--color-surface); background: var(--color-accent); }
+  .gooey-nav[data-ready] .gooey-link { background: transparent; color: var(--color-ink); }
+  .gooey-link::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--color-accent); opacity: 0; transform: scale(.85); transition: opacity .2s, transform .45s var(--ease-gallery); }
+  .gooey-nav[data-ready] .gooey-link[data-highlighted] { color: var(--color-surface); }
+  .gooey-link[data-highlighted]::before { opacity: 1; transform: scale(1); }
+  .gooey-link:focus-visible { outline-offset: 2px; }
+  .gooey-layer { position: absolute; inset: 0; z-index: 0; filter: url(#gooey-nav-filter); pointer-events: none; }
+  .gooey-nav:not([data-ready]) .gooey-layer { visibility: hidden; }
+  .gooey-pill { position: absolute; border-radius: var(--radius-pill); background: var(--color-accent); transform-origin: 0 0; }
+  .gooey-particles { position: absolute; inset: 0; }
+  .gooey-particles :global(.gooey-particle) { position: absolute; width: 12px; height: 12px; margin: -6px; border-radius: 50%; background: var(--color-accent); }
+  @media (max-width: 1023px) {
+    .header-inner { grid-template-columns: 1fr auto; gap: 12px; }
+    .header-controls { grid-column: 2; grid-row: 1; }
+    .gooey-nav { grid-column: 1 / -1; grid-row: 2; justify-self: end; max-width: 100%; }
+    .gooey-link { padding-inline: 8px; }
+  }
+  @media (max-width: 767px) {
+    .gooey-nav { width: 100%; border-radius: 30px; }
+    .gooey-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .gooey-link { min-height: 44px; padding-inline: 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gooey-layer { display: none; }
+  }
+</style>

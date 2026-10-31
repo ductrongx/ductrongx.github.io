@@ -1,25 +1,38 @@
 ---
 import '../styles/global.css';
-
-interface Props {
-  title: string;
-  description: string;
-}
-
+import '../styles/portfolio.css';
+import Header from '../components/Header.astro';
+import GlassCursor from '../components/GlassCursor.astro';
+import Footer from '../components/Footer.astro';
+import PortfolioAssistant from '../components/PortfolioAssistant.astro';
+interface Props { title: string; description: string }
 const { title, description } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
-
 <!doctype html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#f0f1fa" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-vietnamese.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen bg-white font-sans text-slate-900 antialiased">
-    <slot />
+  <body id="top" class="min-h-screen bg-canvas font-sans text-ink antialiased">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <GlassCursor />
+    <div class:list={{ 'inner-page': Astro.url.pathname !== '/' }}><slot /></div>
+    <Footer />
+    <PortfolioAssistant />
+    <script>import '../components/portfolio-motion';</script>
   </body>
 </html>

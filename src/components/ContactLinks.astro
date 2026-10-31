@@ -1,0 +1,66 @@
+---
+import { profile } from '../data/profile';
+import { Image } from 'astro:assets';
+import gmailLogo from '../assets/icons/gmail-color.png';
+import LinkedInIcon from '../assets/icons/linkedin.svg';
+import GitHubIcon from '../assets/icons/github.svg';
+import FacebookIcon from '../assets/icons/facebook.svg';
+import KaggleIcon from '../assets/icons/kaggle.svg';
+import GmailIcon from '../assets/icons/gmail.svg';
+
+const channels = [
+  { name: 'LinkedIn', Icon: LinkedInIcon },
+  { name: 'GitHub', Icon: GitHubIcon },
+  { name: 'Facebook', Icon: FacebookIcon },
+  { name: 'Kaggle', Icon: KaggleIcon },
+  { name: 'Gmail', Icon: GmailIcon },
+].map(channel => ({
+  ...channel,
+  url: channel.name === 'Gmail'
+    ? (profile.email ? `mailto:${profile.email}` : undefined)
+    : profile.links.find(link => link.label.toLowerCase() === channel.name.toLowerCase())?.url,
+}));
+---
+<nav class="contact-dock" aria-label="Contact channels" data-contact-dock>
+  <ul class="dock-items">
+    {channels.map(({ name, Icon, url }) => {
+      const Tag = url ? 'a' : 'span';
+      return <li>
+        <Tag class="dock-item" href={url} target={url?.startsWith('https:') ? '_blank' : undefined} rel={url?.startsWith('https:') ? 'noopener noreferrer' : undefined} aria-label={url ? (name === 'Gmail' ? `Gmail — Email ${profile.email}` : `${name} (opens in a new tab)`) : `${name} — Link coming soon`} data-dock-item data-magnet={name !== 'Facebook' && url ? true : undefined}>
+          <span class="dock-icon" data-dock-icon data-brand={name}>{name === 'Gmail' ? <Image src={gmailLogo} width={48} height={48} alt="" /> : <Icon width={48} height={48} fill="currentColor" aria-hidden="true" />}</span>
+          <span class="dock-label" aria-hidden="true">{name}{!url && ' · Coming soon'}</span>
+        </Tag>
+      </li>;
+    })}
+  </ul>
+</nav>
+<script>
+  import './contact-dock';
+</script>
+<style>
+  .contact-dock { display: flex; justify-content: center; padding-block: 32px 12px; }
+  .dock-items { display: flex; align-items: end; gap: clamp(12px,2vw,28px); width: max-content; max-width: 100%; }
+  .dock-item { position: relative; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 20px; color: var(--color-ink); touch-action: manipulation; }
+  .dock-icon { display: grid; place-items: center; width: 100%; height: 100%; border: 1px solid var(--color-line); border-radius: inherit; background: var(--color-surface); box-shadow: var(--shadow-surface); transform-origin: 50% 100%; pointer-events: none; transition: border-color .2s, box-shadow .2s; }
+  .dock-icon :global(svg), .dock-icon :global(img) { width: 48px; height: 48px; object-fit: contain; }
+  .dock-icon[data-brand='LinkedIn'] { color: #0a66c2; }
+  .dock-icon[data-brand='GitHub'] { color: #181717; }
+  .dock-icon[data-brand='Facebook'] { color: #0866ff; }
+  .dock-icon[data-brand='Kaggle'] { color: #20beff; }
+  .dock-item:is(:hover,:focus-visible) .dock-icon { border-color: var(--color-focus); }
+  .dock-label { position: absolute; bottom: calc(100% + 36px); left: 50%; padding: 7px 12px; border-radius: 8px; background: var(--color-control); color: var(--color-surface); font-size: 12px; line-height: 1.4; white-space: nowrap; opacity: 0; transform: translate(-50%,6px); pointer-events: none; transition: opacity .18s, transform .25s var(--ease-gallery); }
+  .dock-item:focus-visible .dock-label { opacity: 1; transform: translate(-50%,0); }
+  @media (hover: hover) {
+    .dock-item:hover .dock-label { opacity: 1; transform: translate(-50%,0); }
+  }
+  .contact-dock[data-labels-dismissed] .dock-label { opacity: 0; }
+  @media (max-width: 767px) {
+    .contact-dock { padding-top: 24px; }
+    .dock-item { width: clamp(48px,13vw,60px); height: clamp(48px,13vw,60px); border-radius: 14px; }
+    .dock-icon :global(svg), .dock-icon :global(img) { width: 32px; height: 32px; }
+    .dock-label { bottom: calc(100% + 20px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dock-icon, .dock-label { transition: none; }
+  }
+</style>

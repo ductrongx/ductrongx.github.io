@@ -1,0 +1,16 @@
+---
+interface Props {
+  lines: string[];
+  tag?: 'h1' | 'h2' | 'h3';
+  id?: string;
+  class?: string;
+  split?: 'lines' | 'words';
+  motion?: 'rise' | 'words' | 'sweep' | 'depth';
+}
+const { lines, tag: Tag = 'h2', id, class: className, split = 'lines', motion = split === 'words' ? 'words' : 'rise' } = Astro.props;
+---
+<Tag id={id} class={className} data-line-reveal data-text-motion={motion} aria-label={split === 'words' ? lines.join(' ') : undefined}>
+  {lines.map(line => <span class="line-mask" aria-hidden={split === 'words' ? 'true' : undefined}><span class="line-content">{split === 'words'
+    ? line.split(' ').map((word, index) => <Fragment>{index > 0 && ' '}<span class="word-mask"><span class="word-content">{word}</span></span></Fragment>)
+    : line}</span></span>)}
+</Tag>
