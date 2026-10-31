@@ -1,4 +1,10 @@
 /* Shared controls and text masks; component layout stays with its owner. */
+.cinematic-home { background: var(--color-night); }
+.cinematic-home .home-page { overflow: clip; }
+.cinematic-home .site-header:not([data-tone='light']) { --color-accent: var(--color-laser); --color-ink: var(--color-light-ink); --color-surface: var(--color-night); --color-line: rgb(255 255 255 / .1); color: var(--color-light-ink); background: rgb(3 5 9 / .6); }
+.cinematic-home .site-header[data-scrolled]:not([data-tone='light']) { background: rgb(3 5 9 / .8); border-color: rgb(255 255 255 / .1); }
+.cinematic-home .site-header:not([data-tone='light']) .brand-logo { --brand-blue: #9adfff; color: var(--color-light-ink); }
+.cinematic-home .contact-section .dock-icon { background: var(--color-light-ink); }
 .gallery-shell { width: min(90%, var(--container-gallery)); margin-inline: auto; }
 .project-grid { overflow: clip; padding: 36px 3vw; margin-inline: -3vw; }
 .project-cta { position: relative; gap: 16px; padding-inline: 28px; }

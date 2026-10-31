@@ -3,6 +3,7 @@ import 'lenis/dist/lenis.css';
 import { createProjectEffects } from './project-effects';
 import { createScrollScenes } from './scroll-scenes';
 import { createTextReveals } from './text-reveals';
+import { createSceneTransitions } from './scene-transitions';
 
 // React Bits Magnet / Split Text adapted for static Astro HTML.
 // Source links and MIT + Commons Clause notice: /licenses/react-bits.txt.
@@ -18,9 +19,12 @@ let engineTime = 0;
 let pointer: { x: number; y: number } | undefined;
 let pointerDirty = false;
 
-const hero = document.querySelector<HTMLElement>('[data-hero]');
-const heroMedia = document.querySelector<HTMLElement>('[data-hero-media]');
-const heroCopy = document.querySelector<HTMLElement>('[data-hero-copy]');
+const sceneTransitions = createSceneTransitions(requestFrame, reduced);
+const listenerLifetime = new AbortController();
+const { signal } = listenerLifetime;
+let settleTimer = 0;
+let anchorScrolling = false;
+let wheelGesture = false;
 const magnets = Array.from(document.querySelectorAll<HTMLElement>('[data-magnet]')).map(element => ({
   element, x: 0, y: 0, velocityX: 0, velocityY: 0, targetX: 0, targetY: 0,
 }));
@@ -76,16 +80,11 @@ function renderFrame(time: number) {
   lenis?.raf(engineTime);
   const scroll = window.scrollY;
   frameTime = time;
+  if (pointerDirty) updateMagnetTargets();
   let moving = lenis?.isScrolling === 'smooth';
+  moving = sceneTransitions.render(elapsed, scroll, viewportHeight, pointer) || moving;
   moving = projectEffects.render(elapsed) || moving;
   moving = scrollScenes.render(elapsed, scroll, viewportHeight) || moving;
-  if (pointerDirty) updateMagnetTargets();
-
-  if (hero && heroMedia && heroCopy && desktop.matches && scroll < hero.offsetHeight + viewportHeight) {
-    const progress = clamp(scroll / Math.max(hero.offsetHeight, 1));
-    heroMedia.style.transform = `translate3d(0,${scroll * .1}px,0) scale(${1 - progress * .12})`;
-    heroCopy.style.transform = `translate3d(0,${-scroll * .16}px,0)`;
-  }
 
   // Small spring steps stay stable across refresh rates and occasional long frames.
   const steps = Math.ceil(elapsed / (1000 / 120));
@@ -115,6 +114,7 @@ function renderFrame(time: number) {
 
 function measure() {
   viewportHeight = window.innerHeight;
+  sceneTransitions.measure(desktop.matches && !reduced.matches);
   scrollScenes.measure();
   scrollScenes.render(0, window.scrollY, viewportHeight);
   lenis?.resize();
@@ -122,21 +122,21 @@ function measure() {
 }
 
 function configureMotion() {
+  clearTimeout(settleTimer);
+  anchorScrolling = wheelGesture = false;
   lenis?.destroy();
   lenis = undefined;
   engineTime = 0;
   frameTime = 0;
   if (!reduced.matches && desktop.matches) {
     lenis = new Lenis({
-      lerp: .085, autoRaf: false, smoothWheel: true, syncTouch: false, anchors: false,
-      virtualScroll: data => { data.deltaY = clamp(data.deltaY, -220, 220); return true; },
+      lerp: .1, autoRaf: false, smoothWheel: true, syncTouch: false, anchors: false,
     });
     lenis.on('virtual-scroll', requestFrame);
     lenis.on('scroll', requestFrame);
   }
   if (reduced.matches || !desktop.matches) {
-    heroMedia?.style.removeProperty('transform');
-    heroCopy?.style.removeProperty('transform');
+    sceneTransitions.reset();
     magnets.forEach(magnet => {
       magnet.x = magnet.y = magnet.velocityX = magnet.velocityY = magnet.targetX = magnet.targetY = 0;
       magnet.element.style.removeProperty('translate');
@@ -157,10 +157,10 @@ window.addEventListener('pointermove', event => {
   pointer = { x: event.clientX, y: event.clientY };
   pointerDirty = true;
   requestFrame();
-}, { passive: true });
-window.addEventListener('blur', releasePointer);
-document.documentElement.addEventListener('pointerleave', releasePointer);
-document.addEventListener('pointerdown', releasePointer, { passive: true });
+}, { passive: true, signal });
+window.addEventListener('blur', releasePointer, { signal });
+document.documentElement.addEventListener('pointerleave', releasePointer, { signal });
+document.addEventListener('pointerdown', releasePointer, { passive: true, signal });
 
 document.addEventListener('click', event => {
   if (!(event.target instanceof Element) || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -173,34 +173,74 @@ document.addEventListener('click', event => {
   const target = document.getElementById(id);
   if (!target) return;
   event.preventDefault();
+  clearTimeout(settleTimer);
+  wheelGesture = false;
+  anchorScrolling = true;
   history.pushState(null, '', url.hash);
   const finish = () => {
+    anchorScrolling = false;
     target.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
   };
   if (lenis && !reduced.matches) {
-    lenis.scrollTo(target, { duration: 1.2, lerp: 0, onComplete: finish });
+    lenis.scrollTo(sceneTransitions.targetTop(target), { duration: .85, lerp: 0, onComplete: finish });
     requestFrame();
   } else {
     target.scrollIntoView({ behavior: reduced.matches ? 'instant' : 'smooth', block: 'start' });
     finish();
   }
-});
+}, { signal });
 
-document.addEventListener('focusin', releasePointer);
-window.addEventListener('scroll', releasePointer, { passive: true });
-window.addEventListener('resize', measure, { passive: true });
-window.addEventListener('pageshow', measure);
+// Settle only inside a small landing zone after wheel inertia has ended.
+// Long sections, keyboard navigation and touch scrolling remain unrestricted.
+function settleSection() {
+  if (!wheelGesture || !lenis || reduced.matches || anchorScrolling || document.hidden
+    || document.querySelector('dialog[open]') || document.activeElement?.matches('input,textarea,select,[contenteditable="true"]')) return;
+  if (lenis.isScrolling || Math.abs(lenis.velocity) > .1) {
+    settleTimer = window.setTimeout(settleSection, 100);
+    return;
+  }
+  wheelGesture = false;
+  const stop = sceneTransitions.nearestStop(window.scrollY);
+  if (stop === undefined) return;
+  lenis.scrollTo(stop, { duration: .45, lerp: 0 });
+  requestFrame();
+}
+window.addEventListener('wheel', () => {
+  anchorScrolling = false;
+  wheelGesture = true;
+  clearTimeout(settleTimer);
+  settleTimer = window.setTimeout(settleSection, 240);
+}, { passive: true, signal });
+window.addEventListener('keydown', () => { wheelGesture = false; clearTimeout(settleTimer); }, { signal });
+window.addEventListener('pointerdown', () => { wheelGesture = false; clearTimeout(settleTimer); }, { passive: true, signal });
+
+document.addEventListener('focusin', releasePointer, { signal });
+window.addEventListener('scroll', () => {
+  sceneTransitions.syncHeader(window.scrollY);
+  releasePointer();
+}, { passive: true, signal });
+window.addEventListener('resize', measure, { passive: true, signal });
+window.addEventListener('pageshow', measure, { signal });
 document.addEventListener('assistant-visibility', () => {
   if (document.querySelector('#portfolio-chat[open]')) lenis?.stop();
   else lenis?.start();
   releasePointer();
-});
+}, { signal });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { cancelAnimationFrame(frameId); frameId = 0; frameTime = 0; }
+  if (document.hidden) { cancelAnimationFrame(frameId); frameId = 0; frameTime = 0; sceneTransitions.suspend(); clearTimeout(settleTimer); }
   else measure();
-});
-reduced.addEventListener('change', configureMotion);
-desktop.addEventListener('change', configureMotion);
+}, { signal });
+reduced.addEventListener('change', configureMotion, { signal });
+desktop.addEventListener('change', configureMotion, { signal });
+window.addEventListener('pagehide', event => {
+  clearTimeout(settleTimer);
+  cancelAnimationFrame(frameId);
+  frameId = 0;
+  if (event.persisted) return;
+  lenis?.destroy();
+  sceneTransitions.destroy();
+  listenerLifetime.abort();
+}, { signal });
 configureMotion();
 void document.fonts.ready.then(measure);

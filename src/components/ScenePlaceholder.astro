@@ -1,59 +1,49 @@
 ---
 import TiltCard from './TiltCard.astro';
-interface Props {
-  number: string;
-  title: string;
-  note: string;
-  variant?: 'hero' | 'project';
-}
-const { number, title, note, variant = 'project' } = Astro.props;
+interface Props { number: string; title: string; note: string; variant?: 'hero' | 'project' }
+const {number,title,note,variant='project'}=Astro.props;
+const artwork=(Number(number)-1)%4;
+const metalId=`concept-metal-${number}`;
+const glowId=`concept-glow-${number}`;
 ---
-<div class:list={['scene-space', `scene-space--${variant}`]}>
+<div class:list={['scene-space',`scene-space--${variant}`]} data-artwork={artwork}>
   <TiltCard>
-  <div class="scene-surface relative flex flex-col justify-between rounded-gallery bg-surface p-7 sm:p-10 lg:p-12">
-    <div class="flex items-center justify-between gap-4 text-caption font-medium uppercase" data-depth-layer>
-      <span class="flex items-center gap-3"><span class="scene-dot" aria-hidden="true"></span><span data-scramble>White box / {title}</span></span>
-      <span>{number}</span>
+    <div class="scene-surface">
+      <div class="scene-topline flex items-center justify-between gap-4"><span>{title}</span><span>{number}</span></div>
+      <svg viewBox="0 0 600 380" width="600" height="380" aria-hidden="true">
+        <defs>
+          <linearGradient id={metalId} x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#f3fdff"/><stop offset=".2" stop-color="#5e788e"/><stop offset=".38" stop-color="#d5efff"/><stop offset=".55" stop-color="#253e59"/><stop offset=".8" stop-color="#88c5f1"/><stop offset="1" stop-color="#e1faff"/></linearGradient>
+          <radialGradient id={glowId}><stop stop-color="currentColor" stop-opacity=".3"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse cx="300" cy="195" rx="245" ry="175" fill={`url(#${glowId})`}/>
+        {artwork===0 && <g fill="none" stroke={`url(#${metalId})`} stroke-width="22">
+          <ellipse cx="300" cy="195" rx="154" ry="70" transform="rotate(-34 300 195)"/><ellipse cx="300" cy="195" rx="154" ry="70" transform="rotate(33 300 195)"/><ellipse cx="300" cy="195" rx="154" ry="70" transform="rotate(90 300 195)"/>
+          <circle cx="300" cy="195" r="32" fill="currentColor" stroke-width="3"/>
+        </g>}
+        {artwork===1 && <g fill="none" stroke={`url(#${metalId})`} stroke-width="13" transform="translate(300 190) rotate(-25)">
+          {[0,1,2,3,4].map(index=><rect x={-120+index*18} y={-105+index*18} width="180" height="180" rx="16"/>)}
+          <path d="M-100 130 125-95" stroke="currentColor" stroke-width="3"/>
+        </g>}
+        {artwork===2 && <g transform="translate(300 185) rotate(-25)">
+          {Array.from({length:9},(_,column)=>Array.from({length:7},(_,row)=><g transform={`translate(${(column-4)*34} ${(row-3)*27})`}><path d="m0-12 13 7v14L0 16-13 9V-5Z" fill={`url(#${metalId})`} opacity={.35+(column+row)/24}/><path d="m-13-5 13 7 13-7M0 2v14" fill="none" stroke="#d9f3ff" stroke-width=".5"/></g>))}
+        </g>}
+        {artwork===3 && <g fill="none" stroke={`url(#${metalId})`} stroke-width="2">
+          {Array.from({length:27},(_,index)=><path d={`M65 ${100+index*6} C190 ${330-index*7} 240 ${-40+index*7} 350 ${170+index*3} S490 ${300-index*4} 540 ${125+index*5}`}/>)}
+        </g>}
+      </svg>
+      <div class="scene-caption flex items-end justify-between gap-4"><p>{note}</p><span aria-hidden="true">↗</span></div>
     </div>
-    <div class="scene-target my-8 self-center" aria-hidden="true" data-depth-layer>
-      <i></i><i></i><i></i><i></i>
-      <span class="scene-symbol">3D<span class="text-accent">*</span></span>
-      <span class="text-caption uppercase">Space for the unexpected</span>
-    </div>
-    <div class="flex items-end justify-between gap-5 text-caption" data-depth-layer>
-      <p class="max-w-72 leading-relaxed">{note}</p>
-      <span class="scene-axis shrink-0" aria-hidden="true"><span>+</span><span>+</span><span>+</span></span>
-    </div>
-  </div>
   </TiltCard>
 </div>
 <style>
-  .scene-space { perspective: 1500px; }
-  .scene-space--hero { display: flex; min-height: 420px; }
-  .scene-space--hero .scene-surface { flex: 1; }
-  .scene-space--project { display: flex; width: 100%; aspect-ratio: 1.54; min-height: 300px; }
-  .scene-space--project .scene-surface { flex: 1; min-width: 0; padding: clamp(24px,2vw,40px); }
-  .scene-space--project .scene-target { margin-block: 20px; width: clamp(120px,11vw,180px); min-height: clamp(110px,9vw,160px); }
-  .scene-surface { min-height: inherit; transform-origin: 50% 50%; transform-style: preserve-3d; }
-  [data-depth-layer] { transform: translateZ(30px); }
-  .scene-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); }
-  .scene-target { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; width: 180px; min-height: 160px; }
-  .scene-target i { position: absolute; width: 15px; height: 15px; border-color: var(--color-line); border-style: solid; }
-  .scene-target i:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
-  .scene-target i:nth-child(2) { top: 0; right: 0; border-width: 1px 1px 0 0; }
-  .scene-target i:nth-child(3) { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
-  .scene-target i:nth-child(4) { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
-  .scene-symbol { font-size: 64px; line-height: 1; letter-spacing: -.06em; }
-  .scene-symbol > span { display: inline-block; vertical-align: top; font-size: 40px; margin-left: 4px; }
-  .scene-axis { display: flex; gap: 20px; font-size: 20px; }
-  @media (max-width: 640px) {
-    .scene-space--hero { min-height: 380px; }
-    .scene-surface { border-radius: var(--radius-card); }
-    .scene-target { width: 140px; min-height: 132px; }
-    .scene-symbol { font-size: 52px; }
-    .scene-axis { gap: 8px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    [data-depth-layer] { transform: none; }
-  }
+  .scene-space { display: flex; width: 100%; aspect-ratio: 1.5; min-height: 300px; perspective: 1500px; color: #77cfff; }
+  .scene-space[data-artwork='1'] { color: #a29aff; }
+  .scene-space[data-artwork='2'] { color: #a8eab0; }
+  .scene-space[data-artwork='3'] { color: #ffd294; }
+  .scene-surface { display: flex; flex-direction: column; justify-content: space-between; flex: 1; min-width: 0; overflow: clip; position: relative; border-radius: var(--radius-gallery); background: #070b13; padding: 24px; }
+  .scene-topline { position: relative; z-index: 1; color: #dce5f0; font-size: 10px; letter-spacing: .04em; }
+  svg { display: block; width: 100%; height: auto; max-height: 360px; margin-block: -12px; }
+  .scene-caption { position: relative; color: #a9b4c4; font-size: 10px; line-height: 1.5; }
+  .scene-caption > span { font-size: 23px; color: currentColor; }
+  @media (max-width:767px) { .scene-surface { padding: 20px; } }
 </style>

@@ -26,6 +26,10 @@
 }
 
 @theme {
+  --color-night: #030509;
+  --color-light-ink: #f2f4ed;
+  --color-night-muted: #b3bccb;
+  --color-laser: #e8f7a6;
   --color-canvas: #f0f1fa;
   --color-surface: #ffffff;
   --color-ink: #000000;

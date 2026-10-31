@@ -94,7 +94,7 @@ export function createTextReveals(reduced: MediaQueryList) {
     }
   }, { threshold: .1 });
   candidates.forEach(element => {
-    if (!element.closest('[aria-hidden="true"], .sr-only, dialog, pre, code')) observer.observe(element);
+    if (!element.closest('[data-hero], [aria-hidden="true"], .sr-only, dialog, pre, code')) observer.observe(element);
   });
 
   function finishAll() {

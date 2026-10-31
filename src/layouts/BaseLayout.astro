@@ -26,7 +26,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="preload" href="/fonts/manrope-vietnamese.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
   </head>
-  <body id="top" class="min-h-screen bg-canvas font-sans text-ink antialiased">
+  <body id="top" class:list={['min-h-screen bg-canvas font-sans text-ink antialiased', { 'cinematic-home': Astro.url.pathname === '/' }]}>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
     <GlassCursor />
